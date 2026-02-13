@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدخل إلى المفردة الشاذة والارتباط - أ/ عبدالعزيز الفيفي</title>
+    <style>
+        :root { --primary: #2c3e50; --secondary: #34495e; --success: #27ae60; --danger: #e74c3c; --accent: #f39c12; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--accent); }
+        .header { text-align: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #eee; }
+        .school-info { color: var(--secondary); font-weight: bold; font-size: 1.2em; }
+        .intro-box { background: #fff9e6; padding: 15px; border-radius: 10px; border-right: 5px solid var(--accent); margin-bottom: 20px; font-size: 0.95em; line-height: 1.6; }
+        .question-box { background: #fafafa; padding: 20px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; list-style: none; padding: 0; }
+        .options-grid li { padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.3s; background: white; font-weight: 500; }
+        .options-grid li:hover { border-color: var(--accent); background: #fffcf5; }
+        .options-grid li.selected { background: var(--secondary); color: white; border-color: var(--secondary); }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 10px; display: none; border-right: 6px solid; line-height: 1.5; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 10px; }
+        .btn-next { background: var(--primary); color: white; }
+        .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="school-info">ثانوية الأمير عبدالمجيد 🎓</div>
+        <h2>المرحلة التمهيدية: فن المفردة الشاذة والارتباط</h2>
+        <p>إعداد الأستاذ: عبدالعزيز الفيفي</p>
+    </div>
+
+    <div id="start-screen">
+        <div class="intro-box">
+            <strong>عزيزي الطالب:</strong> هذا النموذج صُمم ليدرب عقلك على كشف "العلاقات الخفية". 
+            ستجد نوعين من الأسئلة: 
+            <br>1- <b>المفردة الشاذة:</b> أخرج الكلمة التي لا تنتمي للمجموعة.
+            <br>2- <b>الارتباط:</b> ابحث عن الكلمة الأكثر صلة برأس السؤال.
+        </div>
+        <input type="text" id="student-name" placeholder="اكتب اسمك للمشاركة في التحدي..." style="width: 93%; padding: 15px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #ddd; text-align: center;">
+        <button class="btn btn-next" style="background: var(--success);" onclick="startQuiz()">ابدأ التمهيد ⚡</button>
+    </div>
+
+    <div id="quiz-area" style="display:none;">
+        <div id="q-content"></div>
+        <button id="next-btn" class="btn btn-next" onclick="nextQ()" style="display:none;">فهمت.. السؤال التالي ⬅️</button>
+    </div>
+
+    <div id="result-area" style="display:none; text-align: center;">
+        <h3 style="color: var(--success);">رائع! لقد أنهيت الجولة التمهيدية</h3>
+        <p id="final-score" style="font-size: 1.5em; font-weight: bold;"></p>
+        <p>استعد الآن للنماذج المتقدمة في الفصل الأسبوع القادم.</p>
+        <div class="footer">✨ أ / عبد العزيز الفيفي - ثانوية الأمير عبدالمجيد 🎓</div>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    // المفردة الشاذة
+    { type: "شاذة", q: "أوجد المفردة الشاذة: (تفاح، برتقال، موز، طماطم)", a: ["تفاح", "برتقال", "موز", "طماطم"], c: 3, r: "التفاح والبرتقال والموز فواكه، أما الطماطم فمن الخضروات علمياً. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "أوجد المفردة الشاذة: (أسد، نمر، فهد، غزال)", a: ["أسد", "نمر", "فهد", "غزال"], c: 3, r: "الأسد والنمر والفهد حيوانات مفترسة، أما الغزال فهو من آكلات الأعشاب. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ما الكلمة الأكثر ارتباطاً بـ (كتاب):", a: ["ورق", "مكتبة", "قلم", "قراءة"], c: 0, r: "الارتباط هنا مادي؛ الكتاب يتكون أساساً من الورق. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (متر، لتر، كيلومتر، ميل)", a: ["متر", "لتر", "كيلومتر", "ميل"], c: 1, r: "المتر والكيلومتر والميل وحدات قياس طول، أما اللتر فهو لقياس السوائل (الحجم). ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (نحل):", a: ["عسل", "لدغة", "خلية", "طيران"], c: 2, r: "الارتباط المكاني (البيت) هو الأقوى في اختبارات القدرات؛ النحل مرتبط بالخلية. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (مصر، السودان، الأردن، ليبيا)", a: ["مصر", "السودان", "الأردن", "ليبيا"], c: 2, r: "مصر والسودان وليبيا في قارة أفريقيا، أما الأردن فهي في قارة آسيا. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (جبر، فيزياء، هندسة، حساب)", a: ["جبر", "فيزياء", "هندسة", "حساب"], c: 1, r: "الجبر والهندسة والحساب فروع للرياضيات، أما الفيزياء فهي علم مستقل. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (شتاء):", a: ["مطر", "برد", "مربعانية", "ثلج"], c: 2, r: "المربعانية هي الفترة الأشهر والمرتبطة زمنياً بدخول الشتاء في الجزيرة العربية. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (خليل، صديق، زميل، عدو)", a: ["خليل", "صديق", "زميل", "عدو"], c: 3, r: "الخليل والصديق والزميل تدل على المودة، أما العدو فهو الضد. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (قلم، سبورة، كتاب، ملعب)", a: ["قلم", "سبورة", "كتاب", "ملعب"], c: 3, r: "القلم والسبورة والكتاب أدوات تعليمية، أما الملعب فهو للرياضة. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (صيف):", a: ["حرارة", "مكيف", "سفر", "رطوبة"], c: 0, r: "الحرارة هي الصفة الملازمة والجوهرية للصيف. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (صلاة، صوم، زكاة، صدقة)", a: ["صلاة", "صوم", "زكاة", "صدقة"], c: 3, r: "الصلاة والصوم والزكاة أركان إسلام (واجبة)، أما الصدقة فهي نافلة. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (شعر، نثر، قصة، مقال)", a: ["شعر", "نثر", "قصة", "مقال"], c: 0, r: "النثر والقصة والمقال فنون نثرية، أما الشعر فهو فن موزون ومقفى. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (مستشفى):", a: ["طبيب", "دواء", "مريض", "جراحة"], c: 2, r: "المستشفى وُجد أساساً من أجل (المريض)، فهو الركن الأساسي فيه. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (سيف، خنجر، رمح، درع)", a: ["سيف", "خنجر", "رمح", "درع"], c: 3, r: "السيف والخنجر والرمح أدوات هجوم، أما الدرع فهو أداة دفاع. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (فارس، خيال، راكب، سابح)", a: ["فارس", "خيال", "راكب", "سابح"], c: 3, r: "الفارس والخيال والراكب ترتبط بركوب الخيل، أما السابح ففي الماء. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (طائرة):", a: ["مدرج", "طيار", "جناح", "سفر"], c: 2, r: "الارتباط هنا (جزء من كل)؛ الجناح جزء لا يتجزأ من الطائرة. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (ينبع، الجبيل، مكة، جدة)", a: ["ينبع", "الجبيل", "مكة", "جدة"], c: 2, r: "ينبع والجبيل وجدة مدن ساحلية، أما مكة فهي مدينة جبلية لا تطل على البحر. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (الرياض، القاهرة، دبي، عمان)", a: ["الرياض", "القاهرة", "دبي", "عمان"], c: 2, r: "الرياض والقاهرة وعمان عواصم دول، أما دبي فهي مدينة تجارية وليست العاصمة. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (جامعة):", a: ["كلية", "دكتور", "طالب", "شهادة"], c: 0, r: "الجامعة تتكون من كليات (علاقة الكل بالجزء). ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (تفوق، نجاح، إبداع، إهمال)", a: ["تفوق", "نجاح", "إبداع", "إهمال"], c: 3, r: "كل الكلمات إيجابية ما عدا (إهمال) فهي سلبية. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (حديد، نحاس، ألمنيوم، خشب)", a: ["حديد", "نحاس", "ألمنيوم", "خشب"], c: 3, r: "الحديد والنحاس والألمنيوم معادن، أما الخشب فليس معدناً. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (بحر):", a: ["ملح", "سمك", "موج", "سفينة"], c: 2, r: "الموج هو الحركة الملازمة للبحر وصفته الدائمة. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (عين، أذن، لسان، أنف)", a: ["عين", "أذن", "لسان", "أنف"], c: 2, r: "العين والأذن والأنف توجد منها أزواج أو في الرأس كحواس خارجية، لكن اللسان عضو واحد داخل الفم. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (حوت، دلفين، سمك القرش، تمساح)", a: ["حوت", "دلفين", "سمك القرش", "تمساح"], c: 3, r: "الحوت والدلفين والقرش تعيش في البحر دائماً، التمساح برمائي. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (صلاة):", a: ["وضوء", "قبلة", "خشوع", "مسجد"], c: 0, r: "الوضوء هو الشرط الأساسي الذي يسبق الصلاة (ارتباط لزومي). ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (نوم، رقاد، كرى، يقظة)", a: ["نوم", "رقاد", "كرى", "يقظة"], c: 3, r: "نوم ورقاد وكرى مترادفات، أما اليقظة فهي الضد. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (تفكير، تأمل، تدبر، غفلة)", a: ["تفكير", "تأمل", "تدبر", "غفلة"], c: 3, r: "الكلمات الأولى من أعمال العقل، أما الغفلة فهي غياب العقل. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "ارتباط", q: "ارتباط (نخلة):", a: ["تمر", "سعف", "فسيلة", "جذع"], c: 0, r: "التمر هو الثمرة (الإنتاج) المرتبط بالنخلة. ✨ أ / عبد العزيز الفيفي 🎓" },
+    { type: "شاذة", q: "المفردة الشاذة: (أسود، أحمر، أصفر، باهت)", a: ["أسود", "أحمر", "أصفر", "باهت"], c: 3, r: "الكلمات الأولى ألوان محددة، أما باهت فهي وصف لدرجة اللون وليست لوناً. ✨ أ / عبد العزيز الفيفي 🎓" }
+];
+
+let currentIdx = 0, score = 0;
+
+function startQuiz() {
+    if(!document.getElementById('student-name').value) return alert("فضلاً اكتب اسمك");
+    document.getElementById('start-screen').style.display = 'none';
+    document.getElementById('quiz-area').style.display = 'block';
+    showQ();
+}
+
+function showQ() {
+    const q = quizData[currentIdx];
+    let html = `<p style="color:var(--accent); font-weight:bold;">نوع السؤال: ${q.type}</p>
+                <div class="question-box"><h3>${q.q}</h3></div>
+                <ul class="options-grid">`;
+    q.a.forEach((opt, i) => {
+        html += `<li onclick="check(${i})">${opt}</li>`;
+    });
+    html += `</ul><div id="fdbk" class="feedback"></div>`;
+    document.getElementById('q-content').innerHTML = html;
+    document.getElementById('next-btn').style.display = 'none';
+}
+
+function check(idx) {
+    if(document.getElementById('next-btn').style.display === 'block') return;
+    const q = quizData[currentIdx];
+    const fb = document.getElementById('fdbk');
+    fb.style.display = 'block';
+    if(idx === q.c) {
+        score++;
+        fb.style.borderColor = 'var(--success)';
+        fb.style.background = '#eafaf1';
+        fb.innerHTML = `<strong>صحيح! ✅</strong><br>${q.r}`;
+    } else {
+        fb.style.borderColor = 'var(--danger)';
+        fb.style.background = '#fdedec';
+        fb.innerHTML = `<strong>خطأ ❌</strong> الإجابة هي: ${q.a[q.c]}<br>${q.r}`;
+    }
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextQ() {
+    currentIdx++;
+    if(currentIdx < quizData.length) showQ();
+    else {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('final-score').innerText = `حصلت على: ${score} من ${quizData.length}`;
+    }
+}
+</script>
+</body>
+</html>
